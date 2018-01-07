@@ -21,3 +21,10 @@ Instant
 Transparent
 
 Open
+
+
+## Contracts workflow
+
+![chart_odgds](https://user-images.githubusercontent.com/25910069/34645526-dca1d780-f347-11e7-9c9b-e2e226a81a4d.png)
+
+  
