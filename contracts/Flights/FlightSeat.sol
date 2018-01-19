@@ -40,7 +40,7 @@ contract FlightSeat {
     }
     
     modifier isTransferable {
-        require(now < flightInventoryInstance.getCheckInBegin());
+        require(now < flightInventoryInstance.getCheckInBegin() && transferable);
         _;
     }
     
