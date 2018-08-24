@@ -4,7 +4,7 @@ NOTE: DRAFT
 
 # Smart contracts
 ## Tokens
-### Membership
+### Membership Token
 - ERC20 Token
 - Non transferrable
 ### Stablecoin (eg. Dai)
@@ -14,7 +14,7 @@ NOTE: DRAFT
 ### Loyalty Token
 - Given when you book flight and conclude a flight
 - when you pay at Airline partners
-- when customer visits a Retail Airline Shop w/ Retail Shop Customer Tracking by IoT
+- when customer visits a Retail Airline Shop (eg. KrisShop) w/ Retail Shop Customer Tracking by IoT
 ## Flight Inventory
 - Flight Inventory is managing the flight seats
 - It interacts with FlightSeat contracts
@@ -41,6 +41,25 @@ eg. StarAlliance, ...
 ## Insurance
 - It is an external insurance contract that the consumer will contract with, that will read the Flight Inventory Data and have some logic around refund
 # Demo & Diagram Flow
+- Airline : Deployment of Flight Inventory, Management of FlightSeat, Simple RevenueManagementSystem
+- Airline: FlightRegistry to see all flight inventory's
+> Consumer : See that on chain, can book using Dai
+- InsuranceContract that interacts w/ FlightInventory and w/Consumer for escrow and gives bonus to Consumer
+> External Insurance is deployed and is binded to the Flight, if the flight is delayed more than 2 hours, he will give <Consumer> 100Dai, price of insurance is 10Dai.
+> Consumer takes it
+> Consumer checks in
+> Consumer consumes his ticket
+> Flight happens
+> ATC does tx on chain to give actual departure time
+> ATC does tx on chain to give actual landing time
+> Flight delays more than 2 hours
+> Consumer can directly withdraw his 100 Dai
+> And the automatic escrow of FlightInventory will refund his ticket accordingly to the length of the flight
+> Consumer will get loyalty tokens
+- More complex RevenueManagementSystem that checks if sender has AirlineMembershipTokenLevel1
+- Consortium Airlines Contract - RevenueManagementSystem that interacts with consortium in order to do more complex price computation
+- Consumer pays in retail w/ Loyalty tokens & Dai + Fiat
+- IoT Retail rewards consumer when he is in store w/ Loyalty tokens
 # Extensions
 # Technology Stack Summary
 - Ethereum, Solidity, React, dApp
