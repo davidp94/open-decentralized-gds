@@ -1,0 +1,111 @@
+msc{
+  airline [label="Airline"],
+  analyst [label="Revenue Management Analyst"],
+  reporter [label="ATC Tower Reporter"],
+  buyer1 [label="Buyer1"],
+  buyer2 [label="Buyer2"],
+  btoken [label="BookToken Smart Contract ERC20"],
+  ltoken [label="LoyaltyToken Smart Contract ERC20"],
+  flight [label="FlightInventory"],
+  flightseat1 [label="FlightSeat1"],
+  flightseat2 [label="FlightSeat2"],
+  revenue [label="RevenueManagement"],
+  ipfs [label="Decentralized file storage"],
+  checkin [label="CheckIn Counter App"];
+  
+  airline note airline [label="Airline"],
+  analyst note analyst [label="Set the prices for the flight seats"],
+  reporter note reporter [label="Reports the actual departure/arrival times"],
+  buyer1 note buyer1 [label="Buy ticket"],
+  buyer2 note buyer2 [label="Second hand ticket"],
+  btoken note btoken [label="Smart contract holding all the erc20 tokens - tradable token"],
+  ltoken note ltoken [label="Smart contract holding all the erc20 tokens - tradable token"],
+  flight note flight [label="FlightInventory Smart contract which will be deployed by the Airline - it manages and interacts with the other smart contracts (FlightSeat, RevenueManagement, Tokens)"],
+  flightseat1 note flightseat1 [label="Flight Seat 1 of the Flight Inventory"],
+  flightseat2 note flightseat2 [label="Flight Seat 2 of the Flight Inventory"],
+  revenue note revenue [label="This smart contract holds the pricing of the flight seat - it is updated by the price analyst"],
+  ipfs note ipfs [label="Decentralized file storage"],
+  checkin note checkin [label="CheckIn Counter App"];
+  
+  
+  --- [label="New Flight Deployment"];
+  
+  airline => revenue [label="Deploy and initialize the Revenue Management System Contract"];
+  revenue box revenue [label="Contract Address RMS_address = 0x...."];
+
+  analyst => revenue [label="Can update the prices"];
+  
+  
+  airline => flight [label="Deploy and initialize the Flight Inventory Smart Contract"];
+  flight box flight [label="Contract Address FI_address = 0x...."];
+  
+  
+  airline loop flightseat2 [label="for each seat"] {
+  
+  	airline box airline [label="Deploy a FlightSeat Smart Contract"];
+    airline => flightseat1 [label="Deploy and initialize"];
+    flightseat1 box flightseat1 [label="Contract Address FS1_address = 0x...."];
+    
+    airline => flight [label="addSeatContract(FS1_address)"];
+    flight => flightseat1 [label="isBookable() ?"];
+    flightseat1 => flight [label="True"];
+    flight => flightseat1 [label="is from this flight() ?"];
+    flightseat1 => flight [label="True"];
+
+    flight >> buyer1 [label="Notify the flight seats availability in real time"],
+    flight >> buyer2 [label=""];
+    
+    //airline => flightseat2 [label="Deploy and initialize"];
+    //flightseat2 box flightseat2 [label="Contract Address FS2_address = 0x...."];
+    
+    
+  
+  };
+
+
+  --- [label="Buyer book"];
+
+  buyer1 box buyer1 [label="Buyer needs to have some BOOK tokens, it gets it from some decentralized exchanges like etherdelta"];
+  buyer1 => flight [label="F_price = getPrice()"];
+  flight => revenue [label="getPrice()"];
+  revenue box revenue [label="get the price depending of remainingSeats..."];
+  revenue => flight [label=""], flight => buyer1 [label="F_price"];
+  buyer1 => btoken [label="allow the FI_address contract to get the token from its balance : approve(FI_address, F_price)"];
+  buyer1 => flight [label="book(seatIndex=1)"];
+  flight => btoken [label="transferFrom(buyer1_address, airline_address, F_price)"];
+  flight => flightseat1 [label="book(buyer1_address)"];
+  flightseat1 box flightseat1 [label="booker = buyer1_address"];
+  flight => ltoken [label="transferFrom(FI_address, buyer1_address, miles)"];
+
+  --- [label="if FlightSeat is tradable, buyer can change the flightseat owner"];
+  buyer1 => flightseat1 [label="transfer(buyer2_address)"];
+  flightseat1 box flightseat1 [label="booker = buyer2_address"];
+
+  --- [label="checkin time"];
+  buyer2 box buyer2 [label="complete and fill a form serialized to a file enc_F which is then encrypted to the airline counter private key (privacy feature)"];
+  buyer2 => ipfs [label="stores enc_F"];
+  ipfs box ipfs [label="ipfs store the encrypted file"];
+  buyer2 => flightseat1 [label="checkin(hash(enc_F))"];
+  flightseat1 box flightseat1 [label="check that the checkin time is good -- interaction with FlightInventory"];
+
+  --- [label="counter verification"];
+  buyer1 => buyer1 [label="generate signature that he is the booker + unencrypted checkin form"];
+  buyer1 => checkin [label="show via NFC the boarding pass"];
+  checkin box checkin [label="verify in real time in the blockchain"];
+  checkin => flightseat1 [label="checkUser"];
+  checkin => flightseat1 [label="getHashFile()"];
+  flightseat1 => checkin [label="hash(enc_F)"];
+  checkin <= ipfs [label="retrieves file enc_F"];
+  checkin <= checkin [label="decrypt(enc_F)"];
+  checkin box checkin [label="verify document and checkin things - done"];
+
+
+  --- [label="loyalty/book tokens are tradable for any tokens (including book/loyalty tokens, ethers, usdt...) and could be used in airport store"];
+  
+  --- [label="ATC reports actual arrival/departure time for insurance purpose - but there is no insurance smart contract yet."];
+  reporter => flight [label="setActualDepartureTime(time)"];
+  reporter => flight [label="setActualArrivalTime(time)"];
+  flight note flight [label="now the information can be used by another smart contract which will do getTotalDelay() and gives back collateral to the user who subscribed for an external smart insurance smart conrtact"];
+  
+  
+}
