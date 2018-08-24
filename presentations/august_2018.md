@@ -55,7 +55,11 @@ eg. StarAlliance, ...
 
 > Flight happens
 
+> F&B assets are uniquely identified in the F&B smart contract, and are scanned via NFC via the airplane that shows that they are there
+
 > ATC does tx on chain to give actual departure time
+
+> F&B assets are sold, the NFC chip is destroyed when opening the food, meaning that only wasted food is responding to NFC scan, having statistical data on the flight
 
 > ATC does tx on chain to give actual landing time
 
@@ -70,7 +74,9 @@ eg. StarAlliance, ...
 - More complex RevenueManagementSystem that checks if sender has AirlineMembershipTokenLevel1
 - Consortium Airlines Contract - RevenueManagementSystem that interacts with consortium in order to do more complex price computation
 - Consumer pays in retail w/ Loyalty tokens & Dai + Fiat
+- Consumer can exchange his Loyalty Tokens to Dai on Decentralized Exchange or exchange for fiat on Kraken/Coinbase...
 - IoT Retail rewards consumer when he is in store w/ Loyalty tokens
+- IoT Retail create campaign on chain in order to increase frequentation of the retail store
 # Extensions
 # Technology Stack Summary
 - Ethereum, Solidity, React, dApp
