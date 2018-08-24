@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 import "./RevenueManagementSystem.sol";
 import "./FlightSeat.sol";
-import "../BookToken/BookToken.sol";
+import "../StableToken/StableToken.sol";
 import "../LoyaltyToken/LoyaltyToken.sol";
 
 
@@ -24,7 +24,7 @@ contract FlightInventory {
     uint public actualArrivalTimestamp;
     
     //payment in token
-    BookToken public bookTokenInstance = BookToken(0x0);
+    StableToken public StableTokenInstance = StableToken(0x0);
 
     //loyalty
     LoyaltyToken public loyaltyTokenInstance = LoyaltyToken(0x0);
@@ -65,7 +65,7 @@ contract FlightInventory {
         _;
     }
     
-    function FlightInventory(address _revenueManagementSystemAddress, string _identifier, uint _scheduledDepartureTimestamp, uint _scheduledArrivalTimestamp, uint _checkInPeriod, address _trustedReporter, uint _miles, address _bookTokenAddress, address _loyaltyTokenAddress) public {
+    function FlightInventory(address _revenueManagementSystemAddress, string _identifier, uint _scheduledDepartureTimestamp, uint _scheduledArrivalTimestamp, uint _checkInPeriod, address _trustedReporter, uint _miles, address _StableTokenAddress, address _loyaltyTokenAddress) public {
         emitter = msg.sender;
         
         identifier = _identifier;
@@ -78,7 +78,7 @@ contract FlightInventory {
         
         revenueManagementSystemInstance = RevenueManagementSystem(_revenueManagementSystemAddress);
 
-        bookTokenInstance = BookToken(_bookTokenAddress);
+        StableTokenInstance = StableToken(_StableTokenAddress);
         loyaltyTokenInstance = LoyaltyToken(_loyaltyTokenAddress);
     }
     
@@ -111,7 +111,7 @@ contract FlightInventory {
     }
 
     function book(uint _seatIndex) public seatIndexExists(_seatIndex) {
-        require(bookTokenInstance.transferFrom(msg.sender, emitter, this.getPrice()));
+        require(StableTokenInstance.transferFrom(msg.sender, emitter, this.getPrice()));
         FlightSeat seatInstance = FlightSeat(seatsContracts[_seatIndex]);
         require(seatInstance.isBookable()); // not booked
         
