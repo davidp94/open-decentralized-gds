@@ -1,7 +1,6 @@
 pragma solidity ^0.4.4;
 
 import "./RevenueManagementSystem.sol";
-import "./FlightSeat.sol";
 import "../StableToken/StableToken.sol";
 import "../LoyaltyToken/LoyaltyToken.sol";
 
@@ -31,11 +30,23 @@ contract FlightInventory {
     uint public bookingLoyaltyToken; // miles
     
     
-    event NewSeat(address _emitter, uint _seatNumber, address _seatContractAddress);
-    event RemoveSeat(address _emitter, uint _seatNumber, address _seatContractAddress);
+    event NewSeat(address _emitter, uint _seatNumber);
+    event RemoveSeat(address _emitter, uint _seatNumber);
     
-    address[] public seatsContracts;
-    mapping(address => bool) seatsExists;
+    struct FlightSeat {
+        uint createdAt;
+        uint removedAt;
+        address booker;
+        bytes32 hashCheckIn;
+        bool transferable;
+        uint seatNumber;
+
+        // StableToken Escrow
+        uint stableTokenEscrow;
+        uint loyaltyTokenEscrow;
+    }
+
+    FlightSeat[] public seatsContracts;
     uint remainingSeats = 0;
 
     
@@ -49,19 +60,19 @@ contract FlightInventory {
         _;
     }
     
-    modifier seatNotExists(address _s) {
-        require(!seatsExists[_s]);
+    modifier seatNotExists(uint _seatIndex) {
+        require(seatsContracts[_seatIndex].createdAt == 0 || seatsContracts[_seatIndex].removedAt > 0);
         _;
     }
     
-    modifier seatExists(uint _seatIndex, address _s) {
-        require(seatsContracts[_seatIndex] == _s);
-        require(seatsExists[_s]);
+    modifier seatExists(uint _seatIndex) {
+        require(seatsContracts[_seatIndex].createdAt > 0);
+        require(seatsContracts[_seatIndex].removedAt > 0);
         _;
     }
     
     modifier seatIndexExists(uint _seatIndex) {
-        require(seatsContracts[_seatIndex] != 0x0);
+        require(seatsContracts[_seatIndex].createdAt > 0);
         _;
     }
     
@@ -82,23 +93,25 @@ contract FlightInventory {
         loyaltyTokenInstance = LoyaltyToken(_loyaltyTokenAddress);
     }
     
-    function addSeatContract(address _seatContractAddress) public onlyEmitter seatNotExists(_seatContractAddress) {
-        FlightSeat seatInstance = FlightSeat(_seatContractAddress);
-        require(seatInstance.isBookable());
-        require(seatInstance.getFlightInventory() == address(this));
-        
-        uint index = seatsContracts.push(_seatContractAddress);
-        NewSeat(msg.sender, index, _seatContractAddress);
+    function addSeatContract(uint _seatNumber, bool _transferable) public onlyEmitter {        
+        uint index = seatsContracts.push(FlightSeat({
+            createdAt: now,
+            removedAt: 0,
+            booker: address(0x0),
+            hashCheckIn: bytes32(0x0),
+            transferable: _transferable,
+            seatNumber: _seatNumber,
+
+            stableTokenEscrow: 0,
+            loyaltyTokenEscrow: 0
+        }));
+        NewSeat(msg.sender, index);
         remainingSeats++;
     }
     
-    function removeSeatContract(uint _seatIndex, address _seatContractAddress) public onlyEmitter seatExists(_seatIndex, _seatContractAddress) {
-        FlightSeat seatInstance = FlightSeat(_seatContractAddress);
-        require(seatInstance.isBookable()); // not booked
-        
-        seatsContracts[_seatIndex] = 0x0;
-        seatsExists[_seatContractAddress] = false;
-        RemoveSeat(msg.sender, _seatIndex, _seatContractAddress);
+    function removeSeatContract(uint _seatIndex) public onlyEmitter seatExists(_seatIndex) {
+        seatsContracts[_seatIndex].removedAt = now;
+        RemoveSeat(msg.sender, _seatIndex);
         remainingSeats--;
     }
     
@@ -111,12 +124,58 @@ contract FlightInventory {
     }
 
     function book(uint _seatIndex) public seatIndexExists(_seatIndex) {
-        require(StableTokenInstance.transferFrom(msg.sender, emitter, this.getPrice()));
-        FlightSeat seatInstance = FlightSeat(seatsContracts[_seatIndex]);
-        require(seatInstance.isBookable()); // not booked
+        require(seatsContracts[_seatIndex].removedAt == 0);
+        require(seatsContracts[_seatIndex].booker == address(0x0));
+
+        uint price = this.getPrice();
+        // transfer the tokens to the smart contract that will hold token in escrow until end of flight
+        require(StableTokenInstance.transferFrom(msg.sender, address(this), price));
         
-        require(seatInstance.book(msg.sender));
-        require(loyaltyTokenInstance.transferFrom(address(this), msg.sender, bookingLoyaltyToken));
+        // Book it
+        seatsContracts[_seatIndex].booker = msg.sender;
+        seatsContracts[_seatIndex].stableTokenEscrow = price;
+
+        // TODO: bookingLoyaltyToken in an external smart contract that would do custom rewards based on identity
+        seatsContracts[_seatIndex].loyaltyTokenEscrow = bookingLoyaltyToken;
+    }
+
+    function checkIn(uint _seatIndex, bytes32 _dataHash) public seatIndexExists(_seatIndex) {
+        require(msg.sender == seatsContracts[_seatIndex].booker);
+        seatsContracts[_seatIndex].hashCheckIn = _dataHash;
+    }
+
+    function transfer(uint _seatIndex, address _newowner) public seatIndexExists(_seatIndex) {
+        require(msg.sender == seatsContracts[_seatIndex].booker);
+        require(seatsContracts[_seatIndex].transferable);
+        seatsContracts[_seatIndex].booker = _newowner;
+    }
+
+    function releaseBookingEscrow(uint _seatIndex) public seatIndexExists(_seatIndex) {
+        // example : 
+        // if delay > 1 hour, customer refund of 50%
+        // if delay > 2 hours, customer refund of 100%
+        require(this.isEnded());
+        require(msg.sender == seatsContracts[_seatIndex].booker);
+        uint _delayArrival = this.getDelayArrival();
+
+        uint stableTokenCount = seatsContracts[_seatIndex].stableTokenEscrow;
+        seatsContracts[_seatIndex].stableTokenEscrow = 0;
+        if (_delayArrival > 7200) {
+            // refund 100%
+            require(StableTokenInstance.transferFrom(address(this), msg.sender, stableTokenCount));
+        } else if (_delayArrival > 3600) {
+            // refund 50%
+            uint toEmitterCount = stableTokenCount - stableTokenCount/2;
+            require(StableTokenInstance.transferFrom(address(this), msg.sender, stableTokenCount/2));
+            require(StableTokenInstance.transferFrom(address(this), emitter, toEmitterCount));
+        } else {
+            // 100% all to the emitter
+            require(StableTokenInstance.transferFrom(address(this), emitter, stableTokenCount));
+        }
+        // Send some loyalty tokens from the smart contract to the booker
+        uint loyaltyTokensCount = seatsContracts[_seatIndex].loyaltyTokenEscrow;
+        seatsContracts[_seatIndex].loyaltyTokenEscrow = 0;
+        require(loyaltyTokenInstance.transferFrom(address(this), msg.sender, loyaltyTokensCount));
     }
     
     
