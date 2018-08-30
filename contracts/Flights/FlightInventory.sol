@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "./RevenueManagementSystem.sol";
+import "./RevenueManagementSystemV1.sol";
 import "../StableToken/StableToken.sol";
 import "../LoyaltyToken/LoyaltyToken.sol";
 
@@ -11,7 +11,7 @@ contract FlightInventory {
     address public emitter;
     
     address public revenueManagementSystem;
-    RevenueManagementSystem public revenueManagementSystemInstance = RevenueManagementSystem(0x0);
+    RevenueManagementSystemV1 public revenueManagementSystemInstance = RevenueManagementSystemV1(0x0);
     
     string public identifier;
     uint public checkInPeriod; // seconds before scheduled departure - check in opens
@@ -76,7 +76,20 @@ contract FlightInventory {
         _;
     }
     
-    function FlightInventory(address _revenueManagementSystemAddress, string _identifier, uint _scheduledDepartureTimestamp, uint _scheduledArrivalTimestamp, uint _checkInPeriod, address _trustedReporter, uint _miles, address _StableTokenAddress, address _loyaltyTokenAddress) public {
+    function FlightInventory
+    (
+        address _revenueManagementSystemAddress,
+        string _identifier,
+        uint _scheduledDepartureTimestamp,
+        uint _scheduledArrivalTimestamp,
+        uint _checkInPeriod,
+        address _trustedReporter,
+        uint _miles,
+        address _StableTokenAddress,
+        address _loyaltyTokenAddress
+    ) 
+    public 
+    {
         emitter = msg.sender;
         
         identifier = _identifier;
@@ -87,7 +100,7 @@ contract FlightInventory {
         
         bookingLoyaltyToken = _miles;
         
-        revenueManagementSystemInstance = RevenueManagementSystem(_revenueManagementSystemAddress);
+        revenueManagementSystemInstance = RevenueManagementSystemV1(_revenueManagementSystemAddress);
 
         StableTokenInstance = StableToken(_StableTokenAddress);
         loyaltyTokenInstance = LoyaltyToken(_loyaltyTokenAddress);

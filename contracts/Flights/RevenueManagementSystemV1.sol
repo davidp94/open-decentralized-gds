@@ -2,8 +2,7 @@ pragma solidity ^0.4.4;
 
 
 //davidphan.eth
-contract RevenueManagementSystem {
-    address public emitter;
+contract RevenueManagementSystemV1 {
     address public analyst;
     
     uint[] public prices;
@@ -15,10 +14,10 @@ contract RevenueManagementSystem {
         _;
     }
     
-    function RevenueManagement(uint[] _prices, address _analyst) public {
+    function RevenueManagementSystemV1(uint[] _prices) public {
         require(_prices.length > 0);
         prices = _prices;
-        analyst = _analyst;
+        analyst = msg.sender;
         Pricing(_prices);
     }
     
