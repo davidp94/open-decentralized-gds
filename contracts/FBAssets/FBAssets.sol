@@ -12,8 +12,13 @@ contract FBAssets is Ownable {
     }
 
     FBAsset[] public fbAssets;
+    address public flightInventory;
     
     function FBAssets() public {
+    }
+
+    function setFlightInventory(address _fiAddress) public onlyOwner {
+        flightInventory = _fiAddress;
     }
     
     function addAsset(string sku) public onlyOwner {
