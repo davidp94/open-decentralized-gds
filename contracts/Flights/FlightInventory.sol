@@ -85,7 +85,7 @@ contract FlightInventory {
         uint _checkInPeriod,
         address _trustedReporter,
         uint _miles,
-        address _StableTokenAddress,
+        address _stableTokenAddress,
         address _loyaltyTokenAddress
     ) 
     public 
@@ -102,7 +102,7 @@ contract FlightInventory {
         
         revenueManagementSystemInstance = RevenueManagementSystemV1(_revenueManagementSystemAddress);
 
-        StableTokenInstance = StableToken(_StableTokenAddress);
+        StableTokenInstance = StableToken(_stableTokenAddress);
         loyaltyTokenInstance = LoyaltyToken(_loyaltyTokenAddress);
     }
     
