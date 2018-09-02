@@ -1,0 +1,86 @@
+@startuml
+
+class SIA_API
+
+class RevenueManagementSystemOracle
+
+
+
+package "Blockchain Smart Contracts" {
+
+
+    package "Singapore Airlines" {
+        class FlightInventoryRegistry
+
+        package "Flight SIA1337" {
+            class FlightInventory
+
+            class FBAssets
+        }
+
+        package "Flight SIA4242" {
+            class FlightInventory_SIA4242
+
+            class FBAssets_SIA4242
+        }
+
+        class RevenueManagementSystem
+
+
+        class LoyaltyToken
+
+        class MembershipToken
+    }
+
+
+
+    package "Air France" {
+        class RevenueManagementSystemAF
+
+        class FlightInventoryRegistryAF
+
+        class FlightInventoryAF
+
+        class FBAssetsAF
+
+        class LoyaltyTokenAF
+
+        class MembershipTokenAF
+    }
+
+
+    class Insurance
+
+    class StableToken
+
+    
+
+    
+}
+
+FlightInventoryRegistry --|> "FlightInventory_SIA4242"
+FlightInventoryRegistry --|> "FlightInventory"
+
+
+FlightInventory --|> StableToken
+FlightInventory --|> LoyaltyToken
+FlightInventory --|> RevenueManagementSystem
+FBAssets --|> FlightInventory
+
+RevenueManagementSystem --|> MembershipToken
+
+FBAssets_SIA4242 --|> FlightInventory_SIA4242
+FlightInventory_SIA4242 --|> RevenueManagementSystem
+
+
+/'
+Bootstrap --|> AbstractConsumer
+Bootstrap ..|> Inject
+Bootstrap ..|> Pluggable
+
+HaltCommand --|> AbstractCommand
+HaltCommand ..> Bootstrap
+
+'/
+
+@enduml
