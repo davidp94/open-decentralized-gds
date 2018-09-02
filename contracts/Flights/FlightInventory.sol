@@ -107,7 +107,7 @@ contract FlightInventory {
     }
     
     function addSeat(string _seatIdentifier, bool _transferable) public onlyEmitter {        
-        uint index = seatsContracts.push(FlightSeat({
+        uint length = seatsContracts.push(FlightSeat({
             createdAt: now,
             removedAt: 0,
             booker: address(0x0),
@@ -118,7 +118,7 @@ contract FlightInventory {
             stableTokenEscrow: 0,
             loyaltyTokenEscrow: 0
         }));
-        NewSeat(msg.sender, index);
+        NewSeat(msg.sender, length - 1);
         remainingSeats++;
     }
     
