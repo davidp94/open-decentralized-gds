@@ -30,8 +30,8 @@ contract FlightInventory {
     uint public bookingLoyaltyToken; // miles
     
     
-    event NewSeat(address _emitter, uint _seatNumber);
-    event RemoveSeat(address _emitter, uint _seatNumber);
+    event NewSeat(address _emitter, uint _seatIndex);
+    event RemoveSeat(address _emitter, uint _seatIndex);
     
     struct FlightSeat {
         uint createdAt;
@@ -39,7 +39,7 @@ contract FlightInventory {
         address booker;
         bytes32 hashCheckIn;
         bool transferable;
-        uint seatNumber;
+        string seatIdentifier;
 
         // StableToken Escrow
         uint stableTokenEscrow;
@@ -106,14 +106,14 @@ contract FlightInventory {
         loyaltyTokenInstance = LoyaltyToken(_loyaltyTokenAddress);
     }
     
-    function addSeatContract(uint _seatNumber, bool _transferable) public onlyEmitter {        
+    function addSeat(string _seatIdentifier, bool _transferable) public onlyEmitter {        
         uint index = seatsContracts.push(FlightSeat({
             createdAt: now,
             removedAt: 0,
             booker: address(0x0),
             hashCheckIn: bytes32(0x0),
             transferable: _transferable,
-            seatNumber: _seatNumber,
+            seatIdentifier: _seatIdentifier,
 
             stableTokenEscrow: 0,
             loyaltyTokenEscrow: 0
@@ -122,7 +122,7 @@ contract FlightInventory {
         remainingSeats++;
     }
     
-    function removeSeatContract(uint _seatIndex) public onlyEmitter seatExists(_seatIndex) {
+    function removeSeat(uint _seatIndex) public onlyEmitter seatExists(_seatIndex) {
         seatsContracts[_seatIndex].removedAt = now;
         RemoveSeat(msg.sender, _seatIndex);
         remainingSeats--;
@@ -150,6 +150,7 @@ contract FlightInventory {
 
         // TODO: bookingLoyaltyToken in an external smart contract that would do custom rewards based on identity
         seatsContracts[_seatIndex].loyaltyTokenEscrow = bookingLoyaltyToken;
+        remainingSeats--;
     }
 
     function checkIn(uint _seatIndex, bytes32 _dataHash) public seatIndexExists(_seatIndex) {
