@@ -93,10 +93,7 @@ contract('FlightInventory', async (accounts) => {
         assert.equal(await this.fi.emitter.call(), fiEmitter)
     });
 
-    it("should deploy <Minimal Viable Contract> and add a row of seats", async () => {
-        assert.equal(await this.fi.emitter.call(), fiEmitter)
-
-
+    deployRow = async () => {
         await expectEvent.inTransaction(
             this.fi.addSeat("1A", false, {from: fiEmitter}),
             'NewSeat'
@@ -126,6 +123,12 @@ contract('FlightInventory', async (accounts) => {
             this.fi.addSeat("1F", false, {from: fiEmitter}),
             'NewSeat'
         );
+    }
+
+    it("should deploy <Minimal Viable Contract> and add a row of seats", async () => {
+        assert.equal(await this.fi.emitter.call(), fiEmitter)
+
+        await deployRow();
 
         assert.equal((await this.fi.seatsContracts(0))[5], "1A")  
         assert.equal((await this.fi.seatsContracts(1))[5], "1B")  
@@ -135,6 +138,34 @@ contract('FlightInventory', async (accounts) => {
         assert.equal((await this.fi.seatsContracts(5))[5], "1F")  
  
         
+    });
+
+    it("should deploy <Minimal Viable Contract> and add a row of seats, then let a consumer checks the price and book one seat.", async () => {
+        assert.equal(await this.fi.emitter.call(), fiEmitter)
+
+        await deployRow(); 
+
+        consumerAddress = accounts[42];
+        // consumer got some tokens from some DEX
+        this.st.transfer(consumerAddress, 10000, {from: stEmitter});
+        assert.equal(await this.st.balanceOf(consumerAddress), 10000)
+
+        
+        assert.equal((await this.fi.seatsContracts(0))[5], "1A")  
+        assert.equal((await this.fi.seatsContracts(0))[2], "0x0000000000000000000000000000000000000000")   // .booker
+        
+
+        priceForConsumer = await this.fi.getPrice()
+
+        // consumer allow contract to withdraw priceForConsumer
+        this.st.approve(this.fi.address, priceForConsumer, {from: consumerAddress});
+        // assert.equal((await this.st.allowance(consumerAddress, this.fi))[0], 100);   // TODO: debug 
+
+        // Booking
+        console.log(`${consumerAddress} calls book(0)`);
+        await this.fi.book.sendTransaction(0, {from: consumerAddress});
+
+        assert.equal((await this.fi.seatsContracts(0))[2], consumerAddress)   // .booker        
     });
 
 });
