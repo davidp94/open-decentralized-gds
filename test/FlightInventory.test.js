@@ -11,6 +11,9 @@ var LoyaltyToken = artifacts.require("./LoyaltyToken.sol");
 
 // TODO: Insurance
 
+// Helpers
+var expectEvent = require('./helpers/expectEvent.js');
+
 
 
 contract('FlightInventory', async (accounts) => {
@@ -88,6 +91,50 @@ contract('FlightInventory', async (accounts) => {
 
     it("should deploy <Minimal Viable Contract>", async () => {
         assert.equal(await this.fi.emitter.call(), fiEmitter)
+    });
+
+    it("should deploy <Minimal Viable Contract> and add a row of seats", async () => {
+        assert.equal(await this.fi.emitter.call(), fiEmitter)
+
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1A", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1B", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1C", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1D", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1E", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        await expectEvent.inTransaction(
+            this.fi.addSeat("1F", false, {from: fiEmitter}),
+            'NewSeat'
+        );
+
+        assert.equal((await this.fi.seatsContracts(0))[5], "1A")  
+        assert.equal((await this.fi.seatsContracts(1))[5], "1B")  
+        assert.equal((await this.fi.seatsContracts(2))[5], "1C")  
+        assert.equal((await this.fi.seatsContracts(3))[5], "1D")  
+        assert.equal((await this.fi.seatsContracts(4))[5], "1E")  
+        assert.equal((await this.fi.seatsContracts(5))[5], "1F")  
+ 
+        
     });
 
 });
