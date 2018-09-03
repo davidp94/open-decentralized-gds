@@ -5,14 +5,13 @@ allow_mixing
 ' class SIA_API
 
 class "Decentralized Exchange Portal"
-
+/'
 class "External Reporter dApp" 
 
 class "Insurer A dApp" 
 
 class "Insurer B dApp" 
-
-class SIAPortal
+'/
 
 
 package "Blockchain Smart Contracts" {
@@ -24,20 +23,28 @@ package "Blockchain Smart Contracts" {
     }
 
 
-    package "Singapore Airlines" {
+    package "Airline Foo" {
         class FlightInventoryRegistry
 
-        package "Flight SIA1337" {
+        package "Flight FOO1337" {
             class FlightInventory
 
             class FBAssets
         }
 
+        package "Flight FOO4242" {
+            class FlightInventory4242
+
+            class FBAssets4242
+        }
+
+        /'
         package "Flight SIA4242" {
             class FlightInventory_SIA4242
 
             class FBAssets_SIA4242
         }
+        '/
 
         class RevenueManagementSystem
 
@@ -49,9 +56,9 @@ package "Blockchain Smart Contracts" {
 
 
 
-    package "MyAirlineCompany" {
+    package "Airline Bar" {
 
-        class FlightInventoryRegistryAF
+        class FlightInventoryRegistryBar
 
         package "FlightX" {
 
@@ -60,17 +67,23 @@ package "Blockchain Smart Contracts" {
         package "FlightY" {
             
         }
+
+        FlightInventoryRegistryBar ..> FlightX
+        FlightInventoryRegistryBar ..> FlightY
+        
     }
 
-
+/'
     class Insurance
 
     class Insurance2
 
     class Insurance_SIA4242
 
+
     class ExternalArrivalTimeReporter
 
+'/
     
 
     class StableToken
@@ -94,26 +107,26 @@ package "Centralized Exchange" {
 
 actor User
 
+/'
 actor InsurerB
-
 InsurerB ..> "Insurer B dApp"
-
+'/
 User ..> "dApp dSIA"
 User ..> FlightInventory
-User ..> Insurance2
+' User ..> Insurance2
 
 User ..> "Decentralized Exchange Portal"
 
 
 
 "Decentralized Exchange Portal" ..> DEXContracts
-
+/'
 "Insurer A dApp" ..> Insurance_SIA4242
 
 "Insurer B dApp" ..> Insurance2
 
 "External Reporter dApp" ..> ExternalArrivalTimeReporter
-
+'/
 
 
 Coinbase ..> "Coinbase Wallet"
@@ -129,37 +142,43 @@ LoyaltyToken ..> DEXContracts
 
 
 AirlineRegistry ..> FlightInventoryRegistry
-AirlineRegistry ..> FlightInventoryRegistryAF
+AirlineRegistry ..> FlightInventoryRegistryBar
 
 
 
-ExternalArrivalTimeReporter ..> FlightInventory
+' ExternalArrivalTimeReporter ..> FlightInventory
 
+/'
 Insurance ..> FlightInventory
 Insurance2 ..> FlightInventory
 Insurance2 ..> ExternalArrivalTimeReporter
 
 Insurance_SIA4242 ..> FlightInventory_SIA4242
 
-FlightInventoryRegistry ..> "FlightInventory_SIA4242"
+'/
+
+' FlightInventoryRegistry ..> "FlightInventory_SIA4242"
 FlightInventoryRegistry ..> "FlightInventory"
+FlightInventoryRegistry ..> FlightInventory4242
 
 
 FlightInventory ..> StableToken
-FlightInventory_SIA4242 ..> StableToken
+' FlightInventory_SIA4242 ..> StableToken
 
 FlightInventory ..> LoyaltyToken
-FlightInventory_SIA4242 ..> LoyaltyToken
+' FlightInventory_SIA4242 ..> LoyaltyToken
 
 FlightInventory ..> RevenueManagementSystem
 FBAssets ..> FlightInventory
+FBAssets4242 ..> FlightInventory4242
 
 RevenueManagementSystem ..> MembershipToken
 RevenueManagementSystem ..> ConsortiumToken
 
+/'
 FBAssets_SIA4242 ..> FlightInventory_SIA4242
 FlightInventory_SIA4242 ..> RevenueManagementSystem
-
+'/
 
 /' Oracles '/
 
