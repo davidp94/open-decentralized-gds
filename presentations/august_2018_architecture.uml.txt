@@ -12,6 +12,8 @@ class "Insurer A dApp"
 
 class "Insurer B dApp" 
 
+class SIAPortal
+
 
 package "Blockchain Smart Contracts" {
 
@@ -83,6 +85,8 @@ package "Blockchain Smart Contracts" {
     
 }
 
+"dApp dSIA" ..> FlightInventoryRegistry
+
 package "Centralized Exchange" {
     class Coinbase
 }
@@ -94,6 +98,7 @@ actor InsurerB
 
 InsurerB ..> "Insurer B dApp"
 
+User ..> "dApp dSIA"
 User ..> FlightInventory
 User ..> Insurance2
 
