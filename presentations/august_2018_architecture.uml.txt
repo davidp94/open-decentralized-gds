@@ -1,12 +1,25 @@
 @startuml
+allow_mixing
 
-class SIA_API
 
-class RevenueManagementSystemOracle
+' class SIA_API
 
+class "Decentralized Exchange Portal"
+
+class "External Reporter dApp" 
+
+class "Insurer A dApp" 
+
+class "Insurer B dApp" 
 
 
 package "Blockchain Smart Contracts" {
+
+    package "Airline Consortium" {
+        class ConsortiumToken
+
+        class AirlineRegistry
+    }
 
 
     package "Singapore Airlines" {
@@ -34,53 +47,143 @@ package "Blockchain Smart Contracts" {
 
 
 
-    package "Air France" {
-        class RevenueManagementSystemAF
+    package "MyAirlineCompany" {
 
         class FlightInventoryRegistryAF
 
-        class FlightInventoryAF
+        package "FlightX" {
 
-        class FBAssetsAF
+        }
 
-        class LoyaltyTokenAF
-
-        class MembershipTokenAF
+        package "FlightY" {
+            
+        }
     }
 
 
     class Insurance
 
-    class StableToken
+    class Insurance2
+
+    class Insurance_SIA4242
+
+    class ExternalArrivalTimeReporter
 
     
+
+    class StableToken
+
+    class "Coinbase Wallet"
+
+
+    package "Decentralized Exchange" {
+        class DEXContracts
+    }
 
     
 }
 
-FlightInventoryRegistry --|> "FlightInventory_SIA4242"
-FlightInventoryRegistry --|> "FlightInventory"
+package "Centralized Exchange" {
+    class Coinbase
+}
 
 
-FlightInventory --|> StableToken
-FlightInventory --|> LoyaltyToken
-FlightInventory --|> RevenueManagementSystem
-FBAssets --|> FlightInventory
+actor User
 
-RevenueManagementSystem --|> MembershipToken
+actor InsurerB
 
-FBAssets_SIA4242 --|> FlightInventory_SIA4242
-FlightInventory_SIA4242 --|> RevenueManagementSystem
+InsurerB ..> "Insurer B dApp"
 
+User ..> FlightInventory
+User ..> Insurance2
+
+User ..> "Decentralized Exchange Portal"
+
+
+
+"Decentralized Exchange Portal" ..> DEXContracts
+
+"Insurer A dApp" ..> Insurance_SIA4242
+
+"Insurer B dApp" ..> Insurance2
+
+"External Reporter dApp" ..> ExternalArrivalTimeReporter
+
+
+
+Coinbase ..> "Coinbase Wallet"
+
+StableToken ..> "Coinbase Wallet"
+StableToken ..> DEXContracts
+
+
+LoyaltyToken ..> "Coinbase Wallet"
+LoyaltyToken ..> DEXContracts
+
+
+
+
+AirlineRegistry ..> FlightInventoryRegistry
+AirlineRegistry ..> FlightInventoryRegistryAF
+
+
+
+ExternalArrivalTimeReporter ..> FlightInventory
+
+Insurance ..> FlightInventory
+Insurance2 ..> FlightInventory
+Insurance2 ..> ExternalArrivalTimeReporter
+
+Insurance_SIA4242 ..> FlightInventory_SIA4242
+
+FlightInventoryRegistry ..> "FlightInventory_SIA4242"
+FlightInventoryRegistry ..> "FlightInventory"
+
+
+FlightInventory ..> StableToken
+FlightInventory_SIA4242 ..> StableToken
+
+FlightInventory ..> LoyaltyToken
+FlightInventory_SIA4242 ..> LoyaltyToken
+
+FlightInventory ..> RevenueManagementSystem
+FBAssets ..> FlightInventory
+
+RevenueManagementSystem ..> MembershipToken
+RevenueManagementSystem ..> ConsortiumToken
+
+FBAssets_SIA4242 ..> FlightInventory_SIA4242
+FlightInventory_SIA4242 ..> RevenueManagementSystem
+
+
+/' Oracles '/
 
 /'
-Bootstrap --|> AbstractConsumer
-Bootstrap ..|> Inject
-Bootstrap ..|> Pluggable
 
-HaltCommand --|> AbstractCommand
-HaltCommand ..> Bootstrap
 
+package Oracles {
+    class RevenueManagementSystemOracle
+    class FlightInventoryOracle
+    class ArrivalReporterOracle
+    class FBAssetsOracle
+}
+
+RevenueManagementSystemOracle ..> SIA_API
+FlightInventoryOracle ..> SIA_API
+ArrivalReporterOracle ..> SIA_API
+FBAssetsOracle ..> SIA_API
+RevenueManagementSystemOracle ..> RevenueManagementSystem
+FlightInventoryOracle ..> FlightInventory
+FlightInventoryOracle ..> FlightInventory_SIA4242
+FlightInventoryOracle ..> FlightInventoryRegistry
+FBAssetsOracle ..> FBAssets
+ArrivalReporterOracle ..> FlightInventory
+ArrivalReporterOracle ..> FlightInventory_SIA4242
+'/
+
+
+
+/' TODO: FBAssets assetId could be a Supply Chain project contract such as Ambrosus or VeChain
 '/
 
 @enduml
