@@ -68,6 +68,9 @@ package "Blockchain Smart Contracts" {
             
         }
 
+        class LoyaltyTokenBar
+
+
         FlightInventoryRegistryBar ..> FlightX
         FlightInventoryRegistryBar ..> FlightY
         
@@ -98,11 +101,14 @@ package "Blockchain Smart Contracts" {
     
 }
 
-"dApp dSIA" ..> FlightInventoryRegistry
+"dApp dFOO" ..> FlightInventoryRegistry
 
 package "Centralized Exchange" {
     class Coinbase
 }
+
+
+LoyaltyTokenBar ..> DEXContracts : is listed
 
 
 actor User
@@ -111,11 +117,11 @@ actor User
 actor InsurerB
 InsurerB ..> "Insurer B dApp"
 '/
-User ..> "dApp dSIA"
-User ..> FlightInventory
+User ..> "dApp dFOO" : Uses
+"dApp dFOO" ..> FlightInventory : Interact with Inventory
 ' User ..> Insurance2
 
-User ..> "Decentralized Exchange Portal"
+User ..> "Decentralized Exchange Portal" : Exchange StableToken or \nLoyaltyToken with other pairs
 
 
 
@@ -128,15 +134,18 @@ User ..> "Decentralized Exchange Portal"
 "External Reporter dApp" ..> ExternalArrivalTimeReporter
 '/
 
+actor UserB
+
+UserB ..> Coinbase : Trade USD/StableToken\nUSD/LoyaltyToken
 
 Coinbase ..> "Coinbase Wallet"
 
 StableToken ..> "Coinbase Wallet"
-StableToken ..> DEXContracts
+StableToken ..> DEXContracts : is listed
 
 
 LoyaltyToken ..> "Coinbase Wallet"
-LoyaltyToken ..> DEXContracts
+LoyaltyToken ..> DEXContracts : is listed
 
 
 
@@ -158,8 +167,8 @@ Insurance_SIA4242 ..> FlightInventory_SIA4242
 '/
 
 ' FlightInventoryRegistry ..> "FlightInventory_SIA4242"
-FlightInventoryRegistry ..> "FlightInventory"
-FlightInventoryRegistry ..> FlightInventory4242
+FlightInventoryRegistry ..> "FlightInventory" : lists
+FlightInventoryRegistry ..> FlightInventory4242 : lists
 
 
 FlightInventory ..> StableToken
@@ -169,10 +178,10 @@ FlightInventory ..> LoyaltyToken
 ' FlightInventory_SIA4242 ..> LoyaltyToken
 
 FlightInventory ..> RevenueManagementSystem
-FBAssets ..> FlightInventory
-FBAssets4242 ..> FlightInventory4242
+FBAssets ..> FlightInventory : Tracks Food and beverages
+FBAssets4242 ..> FlightInventory4242 : Tracks Food and beverages
 
-RevenueManagementSystem ..> MembershipToken
+RevenueManagementSystem ..> MembershipToken : calculates price if booker has token
 RevenueManagementSystem ..> ConsortiumToken
 
 /'
