@@ -81,3 +81,46 @@ eg. StarAlliance, ...
 # Technology Stack Summary
 - Ethereum, Solidity, React, dApp
 - Dev tools : Ganache, Truffle
+
+
+
+## Problem statement & Value proposition
+
+Blockchain advantages (Incentivization, Openness)
+
+Open Data to open different markets (Insurance, etc)
+
+Loyalty Tokens that can be exchanged for real money
+
+Linking Data and analyzing the Data easily, predictive analysis
+
+Near-instant settlement of the refund of the consumer
+
+Direct interaction with the consumer
+
+## Differentiation (from what is currently existing)
+
+Application that connects directly to the user and give instant rewards (tokens)
+
+## Core technology / Architecture
+
+WIP: UML
+
+## Roadmap / Go-to-market
+
+TODO
+
+## Team Experience and Skillset
+
+TODO
+
+## Presentation of User Journey of the product
+
+See above.
+
+## Any other relevant element to the idea specifically
+
+
+## Optional – Video demo, Github link
+
+This link.
