@@ -141,7 +141,7 @@ contract('FlightInventory', async (accounts) => {
         
     });
 
-    it("should deploy <Minimal Viable Contract> and add a row of seats, then let a consumer checks the price and book one seat.", async () => {
+    it("Test case 1: should deploy <Minimal Viable Contract> and add a row of seats, then let a consumer checks the price and book one seat.", async () => {
         assert.equal(await this.fi.emitter.call(), fiEmitter)
 
         await deployRow(); 
