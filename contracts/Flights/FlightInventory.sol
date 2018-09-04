@@ -176,20 +176,20 @@ contract FlightInventory {
         seatsContracts[_seatIndex].stableTokenEscrow = 0;
         if (_delayArrival > 7200) {
             // refund 100%
-            require(StableTokenInstance.transferFrom(address(this), msg.sender, stableTokenCount));
+            require(StableTokenInstance.transfer(msg.sender, stableTokenCount));
         } else if (_delayArrival > 3600) {
             // refund 50%
             uint toEmitterCount = stableTokenCount - stableTokenCount/2;
-            require(StableTokenInstance.transferFrom(address(this), msg.sender, stableTokenCount/2));
-            require(StableTokenInstance.transferFrom(address(this), emitter, toEmitterCount));
+            require(StableTokenInstance.transfer(msg.sender, stableTokenCount/2));
+            require(StableTokenInstance.transfer(emitter, toEmitterCount));
         } else {
             // 100% all to the emitter
-            require(StableTokenInstance.transferFrom(address(this), emitter, stableTokenCount));
+            require(StableTokenInstance.transfer(emitter, stableTokenCount));
         }
-        // Send some loyalty tokens from the smart contract to the booker
+        // // Send some loyalty tokens from the smart contract to the booker
         uint loyaltyTokensCount = seatsContracts[_seatIndex].loyaltyTokenEscrow;
         seatsContracts[_seatIndex].loyaltyTokenEscrow = 0;
-        require(loyaltyTokenInstance.transferFrom(address(this), msg.sender, loyaltyTokensCount));
+        require(loyaltyTokenInstance.transfer(msg.sender, loyaltyTokensCount));
     }
     
     
@@ -225,6 +225,14 @@ contract FlightInventory {
     
     function isEnded() public constant returns (bool) {
         return actualArrivalTimestamp>0 && actualDepartureTimestamp > 0;
+    }
+
+    function transferLoyaltyTokens(address _to, uint256 _value) public onlyEmitter {
+        require(loyaltyTokenInstance.transfer(_to, _value));
+    }
+
+    function transferStableTokens(address _to, uint256 _value) public onlyEmitter {
+        require(StableTokenInstance.transfer(_to, _value));
     }
     
 }

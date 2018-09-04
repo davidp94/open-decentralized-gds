@@ -13,6 +13,7 @@ var LoyaltyToken = artifacts.require("./LoyaltyToken.sol");
 
 // Helpers
 var expectEvent = require('./helpers/expectEvent.js');
+var {expectThrow} = require('./helpers/expectThrow.js');
 
 
 
@@ -135,7 +136,7 @@ contract('FlightInventory', async (accounts) => {
         assert.equal((await this.fi.seatsContracts(2))[5], "1C")  
         assert.equal((await this.fi.seatsContracts(3))[5], "1D")  
         assert.equal((await this.fi.seatsContracts(4))[5], "1E")  
-        assert.equal((await this.fi.seatsContracts(5))[5], "1F")  
+        assert.equal((await this.fi.seatsContracts(5))[5], "1F")
  
         
     });
@@ -145,9 +146,19 @@ contract('FlightInventory', async (accounts) => {
 
         await deployRow(); 
 
+        // Airline approve N LoyaltyTokens to the smart contract
+        seatsNumbers = 6
+        miles = 400 // (await this.fi.bookingLoyaltyToken())
+        amountToApprove = seatsNumbers * miles
+
+        console.log('------------------------------------');
+        console.log(`Amount to approve ${amountToApprove}`);
+        console.log('------------------------------------');
+        await this.lt.transfer(this.fi.address, amountToApprove, {from: ltEmitter})
+
         consumerAddress = accounts[42];
         // consumer got some tokens from some DEX
-        this.st.transfer(consumerAddress, 10000, {from: stEmitter});
+        await this.st.transfer(consumerAddress, 10000, {from: stEmitter});
         assert.equal(await this.st.balanceOf(consumerAddress), 10000)
 
         
@@ -158,14 +169,41 @@ contract('FlightInventory', async (accounts) => {
         priceForConsumer = await this.fi.getPrice()
 
         // consumer allow contract to withdraw priceForConsumer
-        this.st.approve(this.fi.address, priceForConsumer, {from: consumerAddress});
+        await this.st.approve(this.fi.address, priceForConsumer, {from: consumerAddress});
         // assert.equal((await this.st.allowance(consumerAddress, this.fi))[0], 100);   // TODO: debug 
 
         // Booking
         console.log(`${consumerAddress} calls book(0)`);
         await this.fi.book.sendTransaction(0, {from: consumerAddress});
 
-        assert.equal((await this.fi.seatsContracts(0))[2], consumerAddress)   // .booker        
+        assert.equal((await this.fi.seatsContracts(0))[2], consumerAddress)   // .booker   
+        
+        // should not let anyone book it
+        await expectThrow(this.fi.book(0, {from: consumerAddress}));
+        await expectThrow(this.fi.book(0, {from: accounts[43]}));
+
+        // checkIn by consumerAddress
+        dataHash = web3.sha3('encrypted(NAME/SURNAME/PASSPORT/12345')
+        await this.fi.checkIn(0, dataHash, {from: consumerAddress});
+        assert.equal((await this.fi.seatsContracts(0))[3], dataHash) 
+
+
+        // Reporter sets the actual arrival and departure time.
+        deltaDeparture = 0
+        deltaArrival = 7201 // 2 hours 1 second
+        await this.fi.setActualDepartureTime((await this.fi.scheduledDepartureTimestamp()) + deltaDeparture, {from: reporter}) // in time
+        await this.fi.setActualArrivalTime((await this.fi.scheduledArrivalTimestamp()) + deltaArrival, {from: reporter})
+        
+        assert.equal((await this.fi.isEnded()), true) // the Flight is ended
+
+        // Release escrow given the actual arrival timestamp
+        await this.fi.releaseBookingEscrow(0, {from: consumerAddress})
+
+        // // check balance of stableToken, full refund
+        assert.equal((await this.st.balanceOf(consumerAddress)).valueOf(), 10000)
+        // // check balance of loyaltyToken
+        assert.equal((await this.lt.balanceOf(consumerAddress)).valueOf(), 400)
+        
     });
 
 });
