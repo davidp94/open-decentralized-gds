@@ -7,7 +7,7 @@ var StableToken = artifacts.require("./StableToken.sol");
 var LoyaltyToken = artifacts.require("./LoyaltyToken.sol");
 
 // Extras
-// TODO: FBAssets
+var FBAssets = artifacts.require("./FBAssets.sol");
 
 // TODO: Insurance
 
@@ -186,6 +186,23 @@ contract('FlightInventory', async (accounts) => {
         dataHash = web3.sha3('encrypted(NAME/SURNAME/PASSPORT/12345')
         await this.fi.checkIn(0, dataHash, {from: consumerAddress});
         assert.equal((await this.fi.seatsContracts(0))[3], dataHash) 
+
+
+        // FBAssets
+
+        this.fbAssets = await FBAssets.new();
+        await this.fbAssets.setFlightInventory(this.fi.address);
+        await this.fbAssets.addAsset('burger');
+        await this.fbAssets.addAsset('burger2');
+        await this.fbAssets.addAsset('burger3');
+
+        // flight
+
+        await this.fbAssets.sellAsset(0);
+        await this.fbAssets.sellAsset(2);
+        await this.fbAssets.throwAsset(1);
+        
+        
 
 
         // Reporter sets the actual arrival and departure time.
