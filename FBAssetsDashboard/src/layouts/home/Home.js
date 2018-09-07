@@ -8,9 +8,9 @@ class Home extends Component {
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1 header">
-            <img src={logo} alt="drizzle-logo" />
-            <h1>Drizzle Examples</h1>
-            <p>Examples of how to get started with Drizzle in various situations.</p>
+            {/* <img src={logo} alt="drizzle-logo" /> */}
+            <h1>Food & Beverages Contract Manager</h1>
+            {/* <p>Examples of how to get started with Drizzle in various situations.</p> */}
 
             <br/><br/>
           </div>
@@ -21,7 +21,7 @@ class Home extends Component {
 
             <br/><br/>
           </div>
-
+{/* 
           <div className="pure-u-1-1">
             <h2>SimpleStorage</h2>
             <p>This shows a simple ContractData component with no arguments, along with a form to set its value.</p>
@@ -50,7 +50,7 @@ class Home extends Component {
             <strong>Single Device Data</strong>: <ContractData contract="ComplexStorage" method="singleDD" />
 
             <br/><br/>
-          </div>
+          </div> */}
         </div>
       </main>
     )
