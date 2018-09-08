@@ -10,7 +10,7 @@ class Home extends Component {
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1 header">
-            {/* <img src={logo} alt="drizzle-logo" /> */}
+            <img src={logo} alt="coffee-logo" />
             <h1>Food & Beverages Contract Manager</h1>
             {/* <p>Examples of how to get started with Drizzle in various situations.</p> */}
 
