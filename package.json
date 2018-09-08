@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "pretest": "ganache-cli",
+    "pretest": "ganache-cli &",
     "test": "truffle test",
     "posttest": "pkill -9 ganache-cli"
   },
