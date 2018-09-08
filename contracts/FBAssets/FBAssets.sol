@@ -32,11 +32,15 @@ contract FBAssets is Ownable {
 
     function sellAsset(uint _index) public onlyOwner {
         require(fbAssets[_index].createdAt > 0);
+        require(fbAssets[_index].soldAt == 0);
+        require(fbAssets[_index].thrownAt == 0);
         fbAssets[_index].soldAt = now;
     }
 
     function throwAsset(uint _index) public onlyOwner {
         require(fbAssets[_index].createdAt > 0);
+        require(fbAssets[_index].soldAt == 0);
+        require(fbAssets[_index].thrownAt == 0);
         fbAssets[_index].thrownAt = now;
     }
 
@@ -46,6 +50,10 @@ contract FBAssets is Ownable {
         createdAt = fbAssets[_index].createdAt;
         soldAt = fbAssets[_index].soldAt;
         thrownAt = fbAssets[_index].thrownAt;
-    }   
+    }
+
+    function getAssetCount() public constant returns (uint count) {
+        return fbAssets.length;
+    } 
 
 }
