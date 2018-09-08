@@ -23,8 +23,4 @@ Transparent
 Open
 
 
-## Contracts workflow
-
-![mscgenjs_chart 7](https://user-images.githubusercontent.com/25910069/34652537-8cc472f0-f3d7-11e7-9c5a-fb48e8ac75b3.png)
-
   
