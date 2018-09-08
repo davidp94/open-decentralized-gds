@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { AccountData, ContractData, ContractForm } from 'drizzle-react-components'
 import logo from '../../logo.png'
 
+import Assets from '../Assets/Assets';
+
 class Home extends Component {
   render() {
     return (
@@ -12,16 +14,39 @@ class Home extends Component {
             <h1>Food & Beverages Contract Manager</h1>
             {/* <p>Examples of how to get started with Drizzle in various situations.</p> */}
 
-            <br/><br/>
+            <br /><br />
           </div>
 
           <div className="pure-u-1-1">
-            <h2>Active Account</h2>
-            <AccountData accountIndex="0" units="ether" precision="3" />
-
-            <br/><br/>
+            <h3>Active Account</h3>
+            <AccountData accountIndex="0" units="ether" precision="2" />
+            <br /><br />
+            <h2>Manager of this Contract</h2>
+            <ContractData contract="FBAssets" method="owner" />
+            <h2>FlightInventory of this Contract</h2>
+            <ContractData contract="FBAssets" method="flightInventory" />
+            <ContractForm contract="FBAssets" method="setFlightInventory" />
           </div>
-{/* 
+
+          <div className="pure-u-1-1">
+            <h2>List of food and beverages</h2>
+            <p>
+              Tracked Assets :
+              <ContractData contract="FBAssets" method="getAssetCount" methodArgs={[]} />
+            </p>
+            <h3>Add an asset</h3>
+            <ContractForm contract="FBAssets" method="addAsset" labels={['SKU', 'Add an asset']} />
+            {/* <p><strong>Stored Value</strong>: <ContractData contract="FBAssets" method="getAsset" methodArgs={[0]} /></p> */}
+            <br />
+            <h3>List</h3>
+            <ul>
+            <Assets />
+              
+            </ul>
+            <br /><br />
+          </div>
+
+          {/* 
           <div className="pure-u-1-1">
             <h2>SimpleStorage</h2>
             <p>This shows a simple ContractData component with no arguments, along with a form to set its value.</p>

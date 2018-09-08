@@ -1,5 +1,7 @@
 const FBAssets = artifacts.require("FBAssets.sol")
 
-module.exports = function(deployer) {
-    deployer.deploy(FBAssets);
+module.exports = async (deployer) => {
+    var fbInstance = await FBAssets.deployed();
+
+    await fbInstance.addAsset("First asset")
 };
