@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "pretest": "ganache-cli",
+    "test": "truffle test",
+    "posttest": "pkill -9 ganache-cli"
   },
   "repository": {
     "type": "git",
